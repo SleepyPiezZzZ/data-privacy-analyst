@@ -1,0 +1,427 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.org/schemas/privacy-impact-report.schema.json",
+    "title": "Privacy Impact Analysis Report",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "report_id",
+        "generated_at",
+        "analysis_context",
+        "is_risk_detected",
+        "risk_level",
+        "decision",
+        "summary",
+        "impacted_nodes",
+        "risk_factors",
+        "compliance_basis",
+        "evidence",
+        "actionable_suggestions",
+        "limitations",
+        "analysis_confidence"
+    ],
+    "properties": {
+        "report_id": {
+            "type": "string"
+        },
+        "generated_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "analysis_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "request_id",
+                "source_node_id",
+                "change_type",
+                "change_description",
+                "requested_purpose_code",
+                "changed_field_ids"
+            ],
+            "properties": {
+                "request_id": {
+                    "type": "string"
+                },
+                "source_node_id": {
+                    "type": "string"
+                },
+                "change_type": {
+                    "type": "string",
+                    "enum": [
+                        "purpose_change",
+                        "field_change",
+                        "schema_change",
+                        "access_change",
+                        "new_downstream_consumer",
+                        "unspecified"
+                    ]
+                },
+                "change_description": {
+                    "type": "string"
+                },
+                "requested_purpose_code": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "changed_field_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "is_risk_detected": {
+            "type": "boolean"
+        },
+        "risk_level": {
+            "type": "string",
+            "enum": [
+                "high",
+                "medium",
+                "low",
+                "undetermined"
+            ]
+        },
+        "decision": {
+            "type": "string",
+            "enum": [
+                "block_until_review",
+                "human_review_required",
+                "monitor",
+                "no_material_risk_found",
+                "insufficient_evidence"
+            ]
+        },
+        "summary": {
+            "type": "string",
+            "minLength": 1
+        },
+        "impacted_nodes": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/impacted_node"
+            }
+        },
+        "risk_factors": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/risk_factor"
+            }
+        },
+        "compliance_basis": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/compliance_reference"
+            }
+        },
+        "evidence": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/evidence"
+            }
+        },
+        "actionable_suggestions": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/suggestion"
+            }
+        },
+        "limitations": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "analysis_confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+        }
+    },
+    "$defs": {
+        "impacted_node": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "node_id",
+                "node_name",
+                "node_type",
+                "impact_type",
+                "path_depth",
+                "sensitivity_labels",
+                "original_purpose_codes",
+                "purpose_match",
+                "affected_fields",
+                "explanation",
+                "evidence_ids"
+            ],
+            "properties": {
+                "node_id": {
+                    "type": "string"
+                },
+                "node_name": {
+                    "type": "string"
+                },
+                "node_type": {
+                    "type": "string"
+                },
+                "impact_type": {
+                    "type": "string",
+                    "enum": [
+                        "source",
+                        "direct",
+                        "transitive"
+                    ]
+                },
+                "path_depth": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "sensitivity_labels": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "original_purpose_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "purpose_match": {
+                    "type": "string",
+                    "enum": [
+                        "within_original_purpose",
+                        "outside_original_purpose",
+                        "unknown"
+                    ]
+                },
+                "affected_fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "field_id",
+                            "field_name",
+                            "sensitivity_label"
+                        ],
+                        "properties": {
+                            "field_id": {
+                                "type": "string"
+                            },
+                            "field_name": {
+                                "type": "string"
+                            },
+                            "sensitivity_label": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "explanation": {
+                    "type": "string"
+                },
+                "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "risk_factor": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "risk_factor_id",
+                "factor_type",
+                "severity",
+                "description",
+                "evidence_ids"
+            ],
+            "properties": {
+                "risk_factor_id": {
+                    "type": "string"
+                },
+                "factor_type": {
+                    "type": "string",
+                    "enum": [
+                        "purpose_mismatch",
+                        "high_sensitivity_data",
+                        "broad_downstream_propagation",
+                        "external_data_disclosure",
+                        "missing_metadata",
+                        "insufficient_policy_evidence"
+                    ]
+                },
+                "severity": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low",
+                        "unknown"
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "compliance_reference": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "reference_id",
+                "framework_name",
+                "framework_version",
+                "function_code",
+                "category_code",
+                "subcategory_code",
+                "title",
+                "retrieved_text",
+                "source_url",
+                "relevance_score",
+                "relevance_explanation"
+            ],
+            "properties": {
+                "reference_id": {
+                    "type": "string"
+                },
+                "framework_name": {
+                    "type": "string"
+                },
+                "framework_version": {
+                    "type": "string"
+                },
+                "function_code": {
+                    "type": "string"
+                },
+                "category_code": {
+                    "type": "string"
+                },
+                "subcategory_code": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "retrieved_text": {
+                    "type": "string"
+                },
+                "source_url": {
+                    "type": "string",
+                    "format": "uri"
+                },
+                "relevance_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "relevance_explanation": {
+                    "type": "string"
+                }
+            }
+        },
+        "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "evidence_id",
+                "source_type",
+                "source_tool",
+                "source_pointer",
+                "observed_fact",
+                "supports_claim"
+            ],
+            "properties": {
+                "evidence_id": {
+                    "type": "string"
+                },
+                "source_type": {
+                    "type": "string",
+                    "enum": [
+                        "graph_node",
+                        "graph_edge",
+                        "graph_field",
+                        "policy_record",
+                        "rule_evaluation",
+                        "user_request"
+                    ]
+                },
+                "source_tool": {
+                    "type": "string",
+                    "enum": [
+                        "get_node_details",
+                        "get_downstream_nodes",
+                        "match_privacy_policy",
+                        "system_rule",
+                        "user_input"
+                    ]
+                },
+                "source_pointer": {
+                    "type": "string"
+                },
+                "observed_fact": {
+                    "type": "string"
+                },
+                "supports_claim": {
+                    "type": "string"
+                }
+            }
+        },
+        "suggestion": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "suggestion_id",
+                "priority",
+                "action",
+                "rationale",
+                "owner_role",
+                "completion_criteria",
+                "blocks_processing"
+            ],
+            "properties": {
+                "suggestion_id": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "string",
+                    "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                    ]
+                },
+                "action": {
+                    "type": "string"
+                },
+                "rationale": {
+                    "type": "string"
+                },
+                "owner_role": {
+                    "type": "string"
+                },
+                "completion_criteria": {
+                    "type": "string"
+                },
+                "blocks_processing": {
+                    "type": "boolean"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,175 @@
+{
+    "schema_version": "1.0.0",
+    "tools": [
+        {
+            "name": "get_downstream_nodes",
+            "description": "查询指定数据节点的全部直接和间接下游受影响节点，并返回数据血缘路径和字段映射。",
+            "inputSchema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "node_id"
+                ],
+                "properties": {
+                    "node_id": {
+                        "type": "string",
+                        "description": "起始数据资产节点 ID"
+                    },
+                    "max_depth": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 20,
+                        "default": 10,
+                        "description": "最大下游遍历深度"
+                    },
+                    "include_paths": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "是否返回完整血缘路径"
+                    },
+                    "include_field_mapping": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "是否返回字段级映射关系"
+                    },
+                    "max_nodes": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 200,
+                        "default": 100,
+                        "description": "最大返回节点数量"
+                    }
+                }
+            },
+            "output_description": {
+                "is_found": "boolean，起始节点是否存在",
+                "query_node_id": "string，查询的起始节点 ID",
+                "traversal_direction": "string，固定为 downstream",
+                "traversal_mode": "string，固定为 transitive",
+                "result_count": "integer，实际返回的下游节点数量",
+                "truncated": "boolean，是否因为遍历限制而截断",
+                "nodes": [
+                    {
+                        "node_id": "string",
+                        "name": "string",
+                        "node_type": "string",
+                        "sensitivity_labels": "array",
+                        "original_purposes": "array",
+                        "min_depth": "integer",
+                        "affected_fields": "array",
+                        "paths": "array"
+                    }
+                ],
+                "edges": "array，实际影响路径包含的边",
+                "warnings": "array，查询过程中的警告"
+            }
+        },
+        {
+            "name": "get_node_details",
+            "description": "获取指定数据资产节点的完整元数据，包括敏感度、使用目的、字段详情和相邻血缘关系。",
+            "inputSchema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "node_id"
+                ],
+                "properties": {
+                    "node_id": {
+                        "type": "string",
+                        "description": "目标数据资产节点 ID"
+                    },
+                    "include_fields": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "是否返回字段级详情"
+                    },
+                    "include_related_edges": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "是否返回上下游边信息"
+                    }
+                }
+            },
+            "output_description": {
+                "is_found": "boolean，节点是否存在",
+                "node": "object，节点的完整元数据，字段名称遵循 Data Lineage Graph Schema",
+                "lineage_summary": {
+                    "upstream_node_ids": "array",
+                    "downstream_node_ids": "array",
+                    "incoming_edge_ids": "array",
+                    "outgoing_edge_ids": "array"
+                },
+                "warnings": "array"
+            }
+        },
+        {
+            "name": "match_privacy_policy",
+            "description": "根据自然语言问题，从指定版本的 NIST Privacy Framework 知识库中检索相关 Function、Category 和 Subcategory。",
+            "inputSchema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "keyword"
+                ],
+                "properties": {
+                    "keyword": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 1000,
+                        "description": "自然语言隐私政策检索问题"
+                    },
+                    "framework_version": {
+                        "type": "string",
+                        "enum": [
+                            "1.0"
+                        ],
+                        "default": "1.0"
+                    },
+                    "top_k": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10,
+                        "default": 5
+                    },
+                    "function_filter": {
+                        "type": "array",
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "IDENTIFY-P",
+                                "GOVERN-P",
+                                "CONTROL-P",
+                                "COMMUNICATE-P",
+                                "PROTECT-P"
+                            ]
+                        }
+                    },
+                    "include_full_text": {
+                        "type": "boolean",
+                        "default": true
+                    }
+                }
+            },
+            "output_description": {
+                "query": "string，原始查询关键词",
+                "framework_name": "string，知识框架名称",
+                "framework_version": "string，知识框架版本",
+                "result_count": "integer，实际返回的条目数量",
+                "matches": [
+                    {
+                        "document_id": "string",
+                        "function_code": "string",
+                        "category_code": "string",
+                        "subcategory_code": "string",
+                        "title": "string",
+                        "statement": "string",
+                        "retrieval_score": "number",
+                        "retrieval_method": "string",
+                        "source_url": "string"
+                    }
+                ]
+            }
+        }
+    ]
+}

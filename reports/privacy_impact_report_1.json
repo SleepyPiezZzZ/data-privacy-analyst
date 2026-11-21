@@ -1,0 +1,243 @@
+{
+  "report_id": "RPT-20261118-33804F10",
+  "generated_at": "2026-11-18T07:51:34.603788Z",
+  "analysis_context": {
+    "request_id": "REQ-20261118-688997B6",
+    "source_node_id": "T01_CUSTOMER_RAW",
+    "change_type": "purpose_change",
+    "change_description": "申请将客户姓名和电话号码用于营销个性化推荐",
+    "requested_purpose_code": "marketing_personalization",
+    "changed_field_ids": [
+      "full_name",
+      "phone_number"
+    ]
+  },
+  "is_risk_detected": true,
+  "risk_level": "high",
+  "decision": "block_until_review",
+  "summary": "本次分析针对源节点 T01_CUSTOMER_RAW (Customer Raw Data) 发起的用途变更请求。用户试图将全名（full_name）和电话号码（phone_number）的使用目的从原始批准的“身份核验”变更为“营销个性化推荐”。鉴于这两个字段均被标记为高敏感个人隐私数据（high_sensitive_pii），且新用途不在其登记且批准的用途范围（identity_verification、credit_underwriting）内，系统判定该操作违反了数据最小化和目的限定原则。因此，该风险评定为“高”，决策要求“阻止直至审查通过”，必须由人工复核以确认是否具备合规依据或获得必要授权。",
+  "impacted_nodes": [
+    {
+      "node_id": "T01_CUSTOMER_RAW",
+      "node_name": "Customer Raw Data",
+      "node_type": "raw_data",
+      "impact_type": "source",
+      "path_depth": 0,
+      "sensitivity_labels": [
+        "high_sensitive_pii",
+        "pseudonymous_pii",
+        "sensitive_financial",
+        "sensitive_pii"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting",
+        "identity_verification"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "full_name",
+          "field_name": "Full Name",
+          "sensitivity_label": "high_sensitive_pii"
+        },
+        {
+          "field_id": "phone_number",
+          "field_name": "Phone Number",
+          "sensitivity_label": "high_sensitive_pii"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002",
+        "EV-0003"
+      ],
+      "explanation": "此节点作为原始数据源，其包含的全名和电话均为高敏感度个人标识符。当前登记用途仅为身份核验与信贷审批。请求的新用途（营销个性化）属于典型的二次利用，不仅超出了原始批准范围，而且由于涉及直接面向消费者的营销触达，极易引发隐私侵犯投诉及法律纠纷。必须在此阻断并强制进行人工合规性审查，以评估是否需要重新获取用户明确同意（Opt-in）。"
+    }
+  ],
+  "risk_factors": [
+    {
+      "risk_factor_id": "RF-001",
+      "factor_type": "purpose_mismatch",
+      "severity": "high",
+      "description": "用户请求的新用途不属于当前数据节点和所涉及字段的已登记且批准的用途范围。",
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002",
+        "EV-0003"
+      ]
+    },
+    {
+      "risk_factor_id": "RF-002",
+      "factor_type": "high_sensitivity_data",
+      "severity": "high",
+      "description": "本次分析涉及 high_sensitive_pii 或 sensitive_financial 字段。",
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002",
+        "EV-0003"
+      ]
+    }
+  ],
+  "compliance_basis": [
+    {
+      "reference_id": "NIST-PF-1.0-ID.IM-P6",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.IM-P",
+      "subcategory_code": "ID.IM-P6",
+      "title": "Data elements within the data actions are inventoried",
+      "retrieved_text": "Data elements within the data actions are inventoried.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.948529,
+      "relevance_explanation": "该条目强调了组织必须在数据行动中清点所有数据元素。本报告中通过 graph node 查询详细明确了 full_name 和 phone_number 的属性及敏感度等级，证明了对受影响数据元素的精确识别符合 NIST 框架的清单管理要求。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.DE-P1",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.DE-P",
+      "subcategory_code": "ID.DE-P1",
+      "title": "Data processing ecosystem risk management policies, processes, and procedures are identified, established, assessed,...",
+      "retrieved_text": "Data processing ecosystem risk management policies, processes, and procedures are identified, established, assessed, managed, and agreed to by organizational stakeholders.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.939351,
+      "relevance_explanation": "该条目要求建立和维护数据处理生态系统的风险管理流程。当前的阻断机制（block_until_review）正是这一生态系统风险管控政策的具体执行体现，证明了组织正在积极评估和处理潜在的风险场景。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.IM-P5",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.IM-P",
+      "subcategory_code": "ID.IM-P5",
+      "title": "Purposes for the data actions are inventoried",
+      "retrieved_text": "The purposes for the data actions are inventoried.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.933964,
+      "relevance_explanation": "这是本报告最核心的合规依据之一。条目规定数据行动的目的必须被盘点。证据显示，数据的原始合法目的是“身份核验”，而申请的新目的是“营销”，两者不匹配。这证明了当前操作违反了既定目的盘点与控制的合规要求。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.DE-P4",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.DE-P",
+      "subcategory_code": "ID.DE-P4",
+      "title": "Interoperability frameworks or similar multi-party approaches are used to manage data processing ecosystem privacy risks",
+      "retrieved_text": "Interoperability frameworks or similar multi-party approaches are used to manage data processing ecosystem privacy risks.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.92765,
+      "relevance_explanation": "涉及跨部门或第三方营销合作时，往往需要多方的数据流通。此条目提示在管理数据处理生态系统中的隐私风险时需要考虑互操作性框架。虽然本次分析聚焦内部，但在未来将 PI 信息推送到外部营销渠道时，此条目要求评估多方交互带来的连带隐私风险。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.DE-P2",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.DE-P",
+      "subcategory_code": "ID.DE-P2",
+      "title": "Data processing ecosystem parties (e.g., service providers, customers, partners, product manufacturers, application d...",
+      "retrieved_text": "Data processing ecosystem parties (e.g., service providers, customers, partners, product manufacturers, application developers) are identified, prioritized, and assessed using a privacy risk assessment process.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.925092,
+      "relevance_explanation": "该条目强调使用隐私风险评估过程来识别、排序和评估数据处理生态系统中的各方。在此案例中，营销个性化推荐可能会引入新的数据处理方（如广告平台），这就要求在执行变更前对这些相关方的隐私能力进行评估。"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "EV-0001",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Customer Raw Data\", \"node_id\": \"T01_CUSTOMER_RAW\", \"node_type\": \"raw_data\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"客户身份核验\", \"purpose_code\": \"identity_verification\"}, {\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}], \"sensitivity_labels\": [\"high_sensitive_pii\", \"pseudonymous_pii\", \"sensitive_financial\", \"sensitive_pii\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0002",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW.fields.full_name",
+      "observed_fact": "{\"data_type\": \"VARCHAR(100)\", \"field_id\": \"full_name\", \"name\": \"Full Name\", \"node_id\": \"T01_CUSTOMER_RAW\", \"purpose_codes\": [\"identity_verification\"], \"sensitivity_label\": \"high_sensitive_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0003",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW.fields.phone_number",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"phone_number\", \"name\": \"Phone Number\", \"node_id\": \"T01_CUSTOMER_RAW\", \"purpose_codes\": [\"identity_verification\"], \"sensitivity_label\": \"high_sensitive_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0004",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.IM-P6",
+      "observed_fact": "ID.IM-P6: Data elements within the data actions are inventoried.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0005",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.DE-P1",
+      "observed_fact": "ID.DE-P1: Data processing ecosystem risk management policies, processes, and procedures are identified, established, assessed, managed, and agreed to by organizational stakeholders.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0006",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.IM-P5",
+      "observed_fact": "ID.IM-P5: The purposes for the data actions are inventoried.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0007",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.DE-P4",
+      "observed_fact": "ID.DE-P4: Interoperability frameworks or similar multi-party approaches are used to manage data processing ecosystem privacy risks.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0008",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.DE-P2",
+      "observed_fact": "ID.DE-P2: Data processing ecosystem parties (e.g., service providers, customers, partners, product manufacturers, application developers) are identified, prioritized, and assessed using a privacy risk assessment process.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    }
+  ],
+  "actionable_suggestions": [
+    {
+      "suggestion_id": "SUG-001",
+      "priority": "high",
+      "action": "立即启动人工合规审查流程",
+      "rationale": "当前状态被自动判定为高严重度阻断（block_until_review）。仅靠规则引擎无法权衡特殊的业务豁免权或已有的用户明示同意条款，必须由专职隐私法务人员介入复核。",
+      "owner_role": "Privacy Officer / Compliance Legal",
+      "completion_criteria": "提交一份书面审查意见，详细说明若放行该用途所需满足的法律条件（如补充用户协议、撤回旧有同意等）。",
+      "blocks_processing": true
+    },
+    {
+      "suggestion_id": "SUG-002",
+      "priority": "medium",
+      "action": "执行影响广泛的营销同意获取改造（Opt-in Campaign）",
+      "rationale": "为了实现将 raw_data 用于 marketing_personalization 的最终目标，系统需确保拥有独立、清晰且具有法律效力的用户正向同意（Opt-in）记录。目前系统中缺乏此类记录的支撑。",
+      "owner_role": "Marketing Product Owner & Data Governance Lead",
+      "completion_criteria": "完成数据库层面的同意标志位（consent_flag）开发，并在营销推送前强制校验该标志位的真实性。",
+      "blocks_processing": false
+    }
+  ],
+  "limitations": [
+    "本报告使用 NIST Privacy Framework 1.0 作为自愿性隐私风险管理参考，不构成特定司法辖区的法律合规结论。",
+    "analysis_confidence 为模型自评值，未经统计校准，不能解释为风险发生概率。",
+    "当前源字段没有通过已登记 Edge 找到下游传播路径，不能据此证明其他未登记的数据流转绝对不存在。",
+    "本报告引用的 NIST Privacy Framework 1.0 是一个全球通用的自愿性最佳实践参考框架，并不构成特定国家或司法辖区（如中国《个人信息保护法》PIPL、欧盟 GDPR）下具有强制执行力的违法定性。最终的法律合规责任归属于应用方。",
+    "模型给出的 analysis_confidence 值完全基于本次可用证据的综合度计算得出，并非经过统计学历史数据校准的实际风险发生概率。在实际生产中应结合人工经验综合判断。",
+    "受限于当前图谱查询的范围，本次分析仅检测到了根节点 T01_CUSTOMER_RAW 的直接变更。由于下游可能存在未显式连接或通过复杂逻辑生成的间接流转路径，因此不能绝对排除未登记的数据扩散情况。建议配合定期的全链路血缘扫描进行交叉验证。"
+  ],
+  "analysis_confidence": 0.96
+}

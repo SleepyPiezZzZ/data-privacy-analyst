@@ -3,3 +3,7 @@ __pycache__/
 .env
 .pytest_cache/
 .DS_Store
+
+# Ignore local HuggingFace model weights and vector store cache
+models/
+vector_store/

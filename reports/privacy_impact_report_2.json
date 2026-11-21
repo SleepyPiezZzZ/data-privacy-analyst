@@ -1,0 +1,832 @@
+{
+  "report_id": "RPT-20261118-73C8A298",
+  "generated_at": "2026-11-18T17:55:01.056785Z",
+  "analysis_context": {
+    "request_id": "REQ-20261118-5F966469",
+    "source_node_id": "T01_CUSTOMER_RAW",
+    "change_type": "purpose_change",
+    "change_description": "申请将客户年度收入衍生的收入区间用于营销个性化推荐",
+    "requested_purpose_code": "marketing_personalization",
+    "changed_field_ids": [
+      "annual_income"
+    ]
+  },
+  "is_risk_detected": true,
+  "risk_level": "high",
+  "decision": "block_until_review",
+  "summary": "本次隐私影响分析发现，申请将高敏感金融字段（年收入）派生出的收入区间用于非批准的“营销个性化推荐”目的，存在严重合规风险。原始用途仅限于信用审核与身份核验，新用途完全偏离了数据收集的初衷及用户可能的合理预期。由于该变更涉及从源头到下游多个衍生节点的数据流转，且未建立有效的去标识化或目的隔离措施，因此判定为高风险并建议暂时阻断处理流程以待人工审查。",
+  "impacted_nodes": [
+    {
+      "node_id": "T01_CUSTOMER_RAW",
+      "node_name": "Customer Raw Data",
+      "node_type": "raw_data",
+      "impact_type": "source",
+      "path_depth": 0,
+      "sensitivity_labels": [
+        "high_sensitive_pii",
+        "pseudonymous_pii",
+        "sensitive_financial",
+        "sensitive_pii"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting",
+        "identity_verification"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "annual_income",
+          "field_name": "Annual Income",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002"
+      ],
+      "explanation": "这是收入的原始存储点，标签包含高危敏感信息和金融信息，批准用途不包含任何营销活动。"
+    },
+    {
+      "node_id": "T05_CUSTOMER_PROFILE",
+      "node_name": "Customer Profile",
+      "node_type": "profile",
+      "impact_type": "direct",
+      "path_depth": 1,
+      "sensitivity_labels": [
+        "pseudonymous_pii",
+        "sensitive_financial",
+        "sensitive_pii"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "age_band",
+          "field_name": "Age Band",
+          "sensitivity_label": "sensitive_pii"
+        },
+        {
+          "field_id": "customer_id",
+          "field_name": "Customer ID",
+          "sensitivity_label": "pseudonymous_pii"
+        },
+        {
+          "field_id": "income_band",
+          "field_name": "Income Band",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0003",
+        "EV-0004",
+        "EV-0005",
+        "EV-0006"
+      ],
+      "explanation": "此处通过衍生任务生成收入区间等画像特征，仍受限于原数据的信用审批用途。"
+    },
+    {
+      "node_id": "T07_CREDIT_FEATURE_SET",
+      "node_name": "Credit Feature Set",
+      "node_type": "feature_set",
+      "impact_type": "transitive",
+      "path_depth": 2,
+      "sensitivity_labels": [
+        "derived_sensitive",
+        "pseudonymous_pii",
+        "sensitive_financial"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "customer_id",
+          "field_name": "Customer ID",
+          "sensitivity_label": "pseudonymous_pii"
+        },
+        {
+          "field_id": "income_band",
+          "field_name": "Income Band",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0007",
+        "EV-0008",
+        "EV-0009"
+      ],
+      "explanation": "作为模型推理的输入特征集，这些金融衍生特征被严格限定在信用评估场景中。"
+    },
+    {
+      "node_id": "T08_CREDIT_SCORE",
+      "node_name": "Credit Score",
+      "node_type": "score",
+      "impact_type": "transitive",
+      "path_depth": 3,
+      "sensitivity_labels": [
+        "non_sensitive",
+        "pseudonymous_pii",
+        "sensitive_financial"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting",
+        "regulatory_audit"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "customer_id",
+          "field_name": "Customer ID",
+          "sensitivity_label": "pseudonymous_pii"
+        },
+        {
+          "field_id": "model_version",
+          "field_name": "Model Version",
+          "sensitivity_label": "non_sensitive"
+        },
+        {
+          "field_id": "score_value",
+          "field_name": "Credit Score Value",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0010",
+        "EV-0011",
+        "EV-0012",
+        "EV-0013"
+      ],
+      "explanation": "最终输出的分数直接决定授信决策，基于敏感的财务背景数据，绝不允许挪作他用。"
+    },
+    {
+      "node_id": "T09_RISK_ASSESSMENT",
+      "node_name": "Risk Assessment",
+      "node_type": "score",
+      "impact_type": "transitive",
+      "path_depth": 4,
+      "sensitivity_labels": [
+        "non_sensitive",
+        "pseudonymous_pii",
+        "sensitive_financial"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting",
+        "regulatory_audit"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "assessment_id",
+          "field_name": "Assessment ID",
+          "sensitivity_label": "non_sensitive"
+        },
+        {
+          "field_id": "customer_id",
+          "field_name": "Customer ID",
+          "sensitivity_label": "pseudonymous_pii"
+        },
+        {
+          "field_id": "reason_codes",
+          "field_name": "Decision Reason Codes",
+          "sensitivity_label": "sensitive_financial"
+        },
+        {
+          "field_id": "risk_band",
+          "field_name": "Risk Band",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0014",
+        "EV-0015",
+        "EV-0016",
+        "EV-0017",
+        "EV-0018"
+      ],
+      "explanation": "风险评估结果进一步解释了为何这些派生数据必须被锁定在合规用途内。"
+    },
+    {
+      "node_id": "T11_AUDIT_EXPORT",
+      "node_name": "Audit Export",
+      "node_type": "report",
+      "impact_type": "transitive",
+      "path_depth": 4,
+      "sensitivity_labels": [
+        "non_sensitive",
+        "pseudonymous_pii",
+        "sensitive_financial"
+      ],
+      "original_purpose_codes": [
+        "regulatory_audit"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "customer_id",
+          "field_name": "Customer ID",
+          "sensitivity_label": "pseudonymous_pii"
+        },
+        {
+          "field_id": "export_id",
+          "field_name": "Export ID",
+          "sensitivity_label": "non_sensitive"
+        },
+        {
+          "field_id": "risk_band",
+          "field_name": "Risk Band",
+          "sensitivity_label": "sensitive_financial"
+        },
+        {
+          "field_id": "score_value",
+          "field_name": "Credit Score Value",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0019",
+        "EV-0020",
+        "EV-0021",
+        "EV-0022",
+        "EV-0023"
+      ],
+      "explanation": "审计导出表包含关键金融评分和身份标识，仅限监管和内部审计调阅。"
+    },
+    {
+      "node_id": "T10_UNDERWRITING_REPORT",
+      "node_name": "Underwriting Report",
+      "node_type": "report",
+      "impact_type": "transitive",
+      "path_depth": 5,
+      "sensitivity_labels": [
+        "non_sensitive",
+        "pseudonymous_pii",
+        "sensitive_financial"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting",
+        "regulatory_audit"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "customer_id",
+          "field_name": "Customer ID",
+          "sensitivity_label": "pseudonymous_pii"
+        },
+        {
+          "field_id": "generated_at",
+          "field_name": "Generated At",
+          "sensitivity_label": "non_sensitive"
+        },
+        {
+          "field_id": "report_id",
+          "field_name": "Report ID",
+          "sensitivity_label": "non_sensitive"
+        },
+        {
+          "field_id": "risk_band",
+          "field_name": "Risk Band",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0024",
+        "EV-0025",
+        "EV-0026",
+        "EV-0027",
+        "EV-0028"
+      ],
+      "explanation": "综合报告输出端同样受到限制，不得将其中嵌入的收入相关风险等级用于商业营销。"
+    },
+    {
+      "node_id": "A01_UNDERWRITING_API",
+      "node_name": "Underwriting Report API",
+      "node_type": "api",
+      "impact_type": "transitive",
+      "path_depth": 6,
+      "sensitivity_labels": [
+        "non_sensitive",
+        "pseudonymous_pii",
+        "sensitive_financial"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "response_report_id",
+          "field_name": "Report ID",
+          "sensitivity_label": "non_sensitive"
+        },
+        {
+          "field_id": "response_risk_band",
+          "field_name": "Risk Band",
+          "sensitivity_label": "sensitive_financial"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0029",
+        "EV-0030",
+        "EV-0031"
+      ],
+      "explanation": "API 接口对外提供的是经过封装的审核结果，严禁将其数据源重新映射至营销管道。"
+    }
+  ],
+  "risk_factors": [
+    {
+      "risk_factor_id": "RF-001",
+      "factor_type": "purpose_mismatch",
+      "severity": "high",
+      "description": "用户请求的新用途不属于当前数据节点和所涉及字段的已登记且批准的用途范围。",
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002"
+      ]
+    },
+    {
+      "risk_factor_id": "RF-002",
+      "factor_type": "high_sensitivity_data",
+      "severity": "high",
+      "description": "本次分析涉及 high_sensitive_pii 或 sensitive_financial 字段。",
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002"
+      ]
+    },
+    {
+      "risk_factor_id": "RF-003",
+      "factor_type": "broad_downstream_propagation",
+      "severity": "medium",
+      "description": "变更具有 7 个下游影响节点，需要检查多个处理环节。",
+      "evidence_ids": [
+        "EV-0032",
+        "EV-0033",
+        "EV-0034",
+        "EV-0035",
+        "EV-0036",
+        "EV-0037",
+        "EV-0038",
+        "EV-0039"
+      ]
+    }
+  ],
+  "compliance_basis": [
+    {
+      "reference_id": "NIST-PF-1.0-ID.RA-P1",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.RA-P",
+      "subcategory_code": "ID.RA-P1",
+      "title": "Contextual factors related to the systems/products/services and the data actions are identified (e.g., individuals’ d...",
+      "retrieved_text": "Contextual factors related to the systems/products/services and the data actions are identified (e.g., individuals’ demographics and privacy interests or perceptions, data sensitivity and/or types, visibility of data processing to individuals and third parties).",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.984127,
+      "relevance_explanation": "本条目强调识别系统上下文、个体隐私利益及数据敏感度。本次分析明确指出了年收入数据的高敏感性及其与特定金融用途的相关性，直接对应此要求。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.RA-P3",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.RA-P",
+      "subcategory_code": "ID.RA-P3",
+      "title": "Potential problematic data actions and associated problems are identified",
+      "retrieved_text": "Potential problematic data actions and associated problems are identified.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.961166,
+      "relevance_explanation": "将高度敏感的财务数据用于未经授权的营销推荐被视为潜在的问题数据行为。本报告识别出该行为违反了数据最小化和目的限制原则。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.RA-P2",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.RA-P",
+      "subcategory_code": "ID.RA-P2",
+      "title": "Data analytic inputs and outputs are identified and evaluated for bias",
+      "retrieved_text": "Data analytic inputs and outputs are identified and evaluated for bias.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.960689,
+      "relevance_explanation": "虽然主要关注公平性，但该条目也要求对数据分析的输入输出有清晰的认知。由于用途发生了根本改变，输入数据的使用方式超出了原有算法验证的范围。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.RA-P4",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.RA-P",
+      "subcategory_code": "ID.RA-P4",
+      "title": "Problematic data actions, likelihoods, and impacts are used to determine and prioritize risk",
+      "retrieved_text": "Problematic data actions, likelihoods, and impacts are used to determine and prioritize risk.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.938684,
+      "relevance_explanation": "本次报告正是基于问题数据行动（违规使用）、发生可能性和广泛的下级传播影响来判定高风险级别的依据。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.RA-P5",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.RA-P",
+      "subcategory_code": "ID.RA-P5",
+      "title": "Risk responses are identified, prioritized, and implemented",
+      "retrieved_text": "Risk responses are identified, prioritized, and implemented.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.924455,
+      "relevance_explanation": "基于前述的风险识别，提出的阻断处理和加强人工审批的建议即为确定的风险响应措施。"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "EV-0001",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Customer Raw Data\", \"node_id\": \"T01_CUSTOMER_RAW\", \"node_type\": \"raw_data\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"客户身份核验\", \"purpose_code\": \"identity_verification\"}, {\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}], \"sensitivity_labels\": [\"high_sensitive_pii\", \"pseudonymous_pii\", \"sensitive_financial\", \"sensitive_pii\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0002",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW.fields.annual_income",
+      "observed_fact": "{\"data_type\": \"DECIMAL(14,2)\", \"field_id\": \"annual_income\", \"name\": \"Annual Income\", \"node_id\": \"T01_CUSTOMER_RAW\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0003",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T05_CUSTOMER_PROFILE",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Customer Profile\", \"node_id\": \"T05_CUSTOMER_PROFILE\", \"node_type\": \"profile\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}], \"sensitivity_labels\": [\"pseudonymous_pii\", \"sensitive_financial\", \"sensitive_pii\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0004",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T05_CUSTOMER_PROFILE.fields.age_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"age_band\", \"name\": \"Age Band\", \"node_id\": \"T05_CUSTOMER_PROFILE\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"sensitive_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0005",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T05_CUSTOMER_PROFILE.fields.customer_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"customer_id\", \"name\": \"Customer ID\", \"node_id\": \"T05_CUSTOMER_PROFILE\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"pseudonymous_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0006",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T05_CUSTOMER_PROFILE.fields.income_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"income_band\", \"name\": \"Income Band\", \"node_id\": \"T05_CUSTOMER_PROFILE\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0007",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T07_CREDIT_FEATURE_SET",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Credit Feature Set\", \"node_id\": \"T07_CREDIT_FEATURE_SET\", \"node_type\": \"feature_set\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}], \"sensitivity_labels\": [\"derived_sensitive\", \"pseudonymous_pii\", \"sensitive_financial\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0008",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T07_CREDIT_FEATURE_SET.fields.customer_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"customer_id\", \"name\": \"Customer ID\", \"node_id\": \"T07_CREDIT_FEATURE_SET\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"pseudonymous_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0009",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T07_CREDIT_FEATURE_SET.fields.income_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"income_band\", \"name\": \"Income Band\", \"node_id\": \"T07_CREDIT_FEATURE_SET\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0010",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T08_CREDIT_SCORE",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Credit Score\", \"node_id\": \"T08_CREDIT_SCORE\", \"node_type\": \"score\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}, {\"approval_status\": \"approved\", \"description\": \"内部及监管审计\", \"purpose_code\": \"regulatory_audit\"}], \"sensitivity_labels\": [\"non_sensitive\", \"pseudonymous_pii\", \"sensitive_financial\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0011",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T08_CREDIT_SCORE.fields.customer_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"customer_id\", \"name\": \"Customer ID\", \"node_id\": \"T08_CREDIT_SCORE\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"pseudonymous_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0012",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T08_CREDIT_SCORE.fields.model_version",
+      "observed_fact": "{\"data_type\": \"VARCHAR(32)\", \"field_id\": \"model_version\", \"name\": \"Model Version\", \"node_id\": \"T08_CREDIT_SCORE\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"non_sensitive\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0013",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T08_CREDIT_SCORE.fields.score_value",
+      "observed_fact": "{\"data_type\": \"INTEGER\", \"field_id\": \"score_value\", \"name\": \"Credit Score Value\", \"node_id\": \"T08_CREDIT_SCORE\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0014",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T09_RISK_ASSESSMENT",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Risk Assessment\", \"node_id\": \"T09_RISK_ASSESSMENT\", \"node_type\": \"score\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}, {\"approval_status\": \"approved\", \"description\": \"内部及监管审计\", \"purpose_code\": \"regulatory_audit\"}], \"sensitivity_labels\": [\"non_sensitive\", \"pseudonymous_pii\", \"sensitive_financial\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0015",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T09_RISK_ASSESSMENT.fields.assessment_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"assessment_id\", \"name\": \"Assessment ID\", \"node_id\": \"T09_RISK_ASSESSMENT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"non_sensitive\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0016",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T09_RISK_ASSESSMENT.fields.customer_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"customer_id\", \"name\": \"Customer ID\", \"node_id\": \"T09_RISK_ASSESSMENT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"pseudonymous_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0017",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T09_RISK_ASSESSMENT.fields.reason_codes",
+      "observed_fact": "{\"data_type\": \"JSON\", \"field_id\": \"reason_codes\", \"name\": \"Decision Reason Codes\", \"node_id\": \"T09_RISK_ASSESSMENT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0018",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T09_RISK_ASSESSMENT.fields.risk_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"risk_band\", \"name\": \"Risk Band\", \"node_id\": \"T09_RISK_ASSESSMENT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0019",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T11_AUDIT_EXPORT",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Audit Export\", \"node_id\": \"T11_AUDIT_EXPORT\", \"node_type\": \"report\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"内部及监管审计\", \"purpose_code\": \"regulatory_audit\"}], \"sensitivity_labels\": [\"non_sensitive\", \"pseudonymous_pii\", \"sensitive_financial\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0020",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T11_AUDIT_EXPORT.fields.customer_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"customer_id\", \"name\": \"Customer ID\", \"node_id\": \"T11_AUDIT_EXPORT\", \"purpose_codes\": [\"regulatory_audit\"], \"sensitivity_label\": \"pseudonymous_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0021",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T11_AUDIT_EXPORT.fields.export_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"export_id\", \"name\": \"Export ID\", \"node_id\": \"T11_AUDIT_EXPORT\", \"purpose_codes\": [\"regulatory_audit\"], \"sensitivity_label\": \"non_sensitive\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0022",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T11_AUDIT_EXPORT.fields.risk_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"risk_band\", \"name\": \"Risk Band\", \"node_id\": \"T11_AUDIT_EXPORT\", \"purpose_codes\": [\"regulatory_audit\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0023",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T11_AUDIT_EXPORT.fields.score_value",
+      "observed_fact": "{\"data_type\": \"INTEGER\", \"field_id\": \"score_value\", \"name\": \"Credit Score Value\", \"node_id\": \"T11_AUDIT_EXPORT\", \"purpose_codes\": [\"regulatory_audit\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0024",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T10_UNDERWRITING_REPORT",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Underwriting Report\", \"node_id\": \"T10_UNDERWRITING_REPORT\", \"node_type\": \"report\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}, {\"approval_status\": \"approved\", \"description\": \"内部及监管审计\", \"purpose_code\": \"regulatory_audit\"}], \"sensitivity_labels\": [\"non_sensitive\", \"pseudonymous_pii\", \"sensitive_financial\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0025",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T10_UNDERWRITING_REPORT.fields.customer_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"customer_id\", \"name\": \"Customer ID\", \"node_id\": \"T10_UNDERWRITING_REPORT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"pseudonymous_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0026",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T10_UNDERWRITING_REPORT.fields.generated_at",
+      "observed_fact": "{\"data_type\": \"TIMESTAMP\", \"field_id\": \"generated_at\", \"name\": \"Generated At\", \"node_id\": \"T10_UNDERWRITING_REPORT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"non_sensitive\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0027",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T10_UNDERWRITING_REPORT.fields.report_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"report_id\", \"name\": \"Report ID\", \"node_id\": \"T10_UNDERWRITING_REPORT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"non_sensitive\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0028",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T10_UNDERWRITING_REPORT.fields.risk_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"risk_band\", \"name\": \"Risk Band\", \"node_id\": \"T10_UNDERWRITING_REPORT\", \"purpose_codes\": [\"credit_underwriting\", \"regulatory_audit\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0029",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "A01_UNDERWRITING_API",
+      "observed_fact": "{\"asset_kind\": \"api\", \"name\": \"Underwriting Report API\", \"node_id\": \"A01_UNDERWRITING_API\", \"node_type\": \"api\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}], \"sensitivity_labels\": [\"non_sensitive\", \"pseudonymous_pii\", \"sensitive_financial\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0030",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "A01_UNDERWRITING_API.fields.response_report_id",
+      "observed_fact": "{\"data_type\": \"VARCHAR(36)\", \"field_id\": \"response_report_id\", \"name\": \"Report ID\", \"node_id\": \"A01_UNDERWRITING_API\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"non_sensitive\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0031",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "A01_UNDERWRITING_API.fields.response_risk_band",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"response_risk_band\", \"name\": \"Risk Band\", \"node_id\": \"A01_UNDERWRITING_API\", \"purpose_codes\": [\"credit_underwriting\"], \"sensitivity_label\": \"sensitive_financial\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0032",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E01_PROFILE_BUILD",
+      "observed_fact": "{\"description\": \"根据出生日期计算年龄段，根据年收入生成收入区间；姓名及手机号不下传。\", \"edge_id\": \"E01_PROFILE_BUILD\", \"processing_purpose_codes\": [\"credit_underwriting\"], \"source_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T01_CUSTOMER_RAW\"}, {\"field_id\": \"date_of_birth\", \"node_id\": \"T01_CUSTOMER_RAW\"}, {\"field_id\": \"annual_income\", \"node_id\": \"T01_CUSTOMER_RAW\"}], \"source_node_id\": \"T01_CUSTOMER_RAW\", \"target_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T05_CUSTOMER_PROFILE\"}, {\"field_id\": \"age_band\", \"node_id\": \"T05_CUSTOMER_PROFILE\"}, {\"field_id\": \"income_band\", \"node_id\": \"T05_CUSTOMER_PROFILE\"}], \"target_node_id\": \"T05_CUSTOMER_PROFILE\", \"task_id\": \"JOB_PROFILE_BUILD\", \"task_name\": \"Customer Profile Building\", \"transform_type\": \"derive\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0033",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E05_PROFILE_FEATURE_MAPPING",
+      "observed_fact": "{\"description\": \"将客户画像中的收入区间映射到信用特征数据。\", \"edge_id\": \"E05_PROFILE_FEATURE_MAPPING\", \"processing_purpose_codes\": [\"credit_underwriting\"], \"source_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T05_CUSTOMER_PROFILE\"}, {\"field_id\": \"income_band\", \"node_id\": \"T05_CUSTOMER_PROFILE\"}], \"source_node_id\": \"T05_CUSTOMER_PROFILE\", \"target_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"income_band\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}], \"target_node_id\": \"T07_CREDIT_FEATURE_SET\", \"task_id\": \"JOB_CREDIT_FEATURE\", \"task_name\": \"Profile Feature Mapping\", \"transform_type\": \"normalize\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0034",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E07_CREDIT_MODEL_INFERENCE",
+      "observed_fact": "{\"description\": \"使用模型特征执行信用评分，不向输出表写入姓名或电话号码。\", \"edge_id\": \"E07_CREDIT_MODEL_INFERENCE\", \"processing_purpose_codes\": [\"credit_underwriting\"], \"source_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"income_band\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"debt_to_income_ratio\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"delinquency_90d_count\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"credit_utilization_ratio\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"monthly_txn_count\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}, {\"field_id\": \"device_risk_count\", \"node_id\": \"T07_CREDIT_FEATURE_SET\"}], \"source_node_id\": \"T07_CREDIT_FEATURE_SET\", \"target_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T08_CREDIT_SCORE\"}, {\"field_id\": \"score_value\", \"node_id\": \"T08_CREDIT_SCORE\"}, {\"field_id\": \"model_version\", \"node_id\": \"T08_CREDIT_SCORE\"}], \"target_node_id\": \"T08_CREDIT_SCORE\", \"task_id\": \"JOB_CREDIT_MODEL\", \"task_name\": \"Credit Model Inference\", \"transform_type\": \"model_inference\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0035",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E08_RISK_CLASSIFICATION",
+      "observed_fact": "{\"description\": \"根据信用评分和预设规则生成风险等级及原因代码。\", \"edge_id\": \"E08_RISK_CLASSIFICATION\", \"processing_purpose_codes\": [\"credit_underwriting\"], \"source_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T08_CREDIT_SCORE\"}, {\"field_id\": \"score_value\", \"node_id\": \"T08_CREDIT_SCORE\"}], \"source_node_id\": \"T08_CREDIT_SCORE\", \"target_field_refs\": [{\"field_id\": \"assessment_id\", \"node_id\": \"T09_RISK_ASSESSMENT\"}, {\"field_id\": \"customer_id\", \"node_id\": \"T09_RISK_ASSESSMENT\"}, {\"field_id\": \"risk_band\", \"node_id\": \"T09_RISK_ASSESSMENT\"}, {\"field_id\": \"reason_codes\", \"node_id\": \"T09_RISK_ASSESSMENT\"}], \"target_node_id\": \"T09_RISK_ASSESSMENT\", \"task_id\": \"JOB_RISK_CLASSIFICATION\", \"task_name\": \"Risk Classification\", \"transform_type\": \"classify\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0036",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E09_REPORT_GENERATION",
+      "observed_fact": "{\"description\": \"汇总风险评估结果生成授信报告。\", \"edge_id\": \"E09_REPORT_GENERATION\", \"processing_purpose_codes\": [\"credit_underwriting\"], \"source_field_refs\": [{\"field_id\": \"assessment_id\", \"node_id\": \"T09_RISK_ASSESSMENT\"}, {\"field_id\": \"customer_id\", \"node_id\": \"T09_RISK_ASSESSMENT\"}, {\"field_id\": \"risk_band\", \"node_id\": \"T09_RISK_ASSESSMENT\"}], \"source_node_id\": \"T09_RISK_ASSESSMENT\", \"target_field_refs\": [{\"field_id\": \"report_id\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}, {\"field_id\": \"customer_id\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}, {\"field_id\": \"risk_band\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}, {\"field_id\": \"generated_at\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}], \"target_node_id\": \"T10_UNDERWRITING_REPORT\", \"task_id\": \"JOB_REPORT_GENERATION\", \"task_name\": \"Underwriting Report Generation\", \"transform_type\": \"render\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0037",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E10_SCORE_AUDIT_EXPORT",
+      "observed_fact": "{\"description\": \"将信用评分及客户标识写入内部审计导出表。\", \"edge_id\": \"E10_SCORE_AUDIT_EXPORT\", \"processing_purpose_codes\": [\"regulatory_audit\"], \"source_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T08_CREDIT_SCORE\"}, {\"field_id\": \"score_value\", \"node_id\": \"T08_CREDIT_SCORE\"}], \"source_node_id\": \"T08_CREDIT_SCORE\", \"target_field_refs\": [{\"field_id\": \"customer_id\", \"node_id\": \"T11_AUDIT_EXPORT\"}, {\"field_id\": \"score_value\", \"node_id\": \"T11_AUDIT_EXPORT\"}], \"target_node_id\": \"T11_AUDIT_EXPORT\", \"task_id\": \"JOB_AUDIT_EXPORT\", \"task_name\": \"Credit Score Audit Export\", \"transform_type\": \"export\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0038",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E11_REPORT_AUDIT_EXPORT",
+      "observed_fact": "{\"description\": \"将报告标识和风险等级写入审计导出表。\", \"edge_id\": \"E11_REPORT_AUDIT_EXPORT\", \"processing_purpose_codes\": [\"regulatory_audit\"], \"source_field_refs\": [{\"field_id\": \"report_id\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}, {\"field_id\": \"customer_id\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}, {\"field_id\": \"risk_band\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}], \"source_node_id\": \"T10_UNDERWRITING_REPORT\", \"target_field_refs\": [{\"field_id\": \"export_id\", \"node_id\": \"T11_AUDIT_EXPORT\"}, {\"field_id\": \"customer_id\", \"node_id\": \"T11_AUDIT_EXPORT\"}, {\"field_id\": \"risk_band\", \"node_id\": \"T11_AUDIT_EXPORT\"}], \"target_node_id\": \"T11_AUDIT_EXPORT\", \"task_id\": \"JOB_AUDIT_EXPORT\", \"task_name\": \"Underwriting Report Audit Export\", \"transform_type\": \"export\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0039",
+      "source_type": "graph_edge",
+      "source_tool": "get_downstream_nodes",
+      "source_pointer": "E12_REPORT_API_PUBLISH",
+      "observed_fact": "{\"description\": \"通过 API 向授权业务系统提供报告标识和风险等级。\", \"edge_id\": \"E12_REPORT_API_PUBLISH\", \"processing_purpose_codes\": [\"credit_underwriting\"], \"source_field_refs\": [{\"field_id\": \"report_id\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}, {\"field_id\": \"risk_band\", \"node_id\": \"T10_UNDERWRITING_REPORT\"}], \"source_node_id\": \"T10_UNDERWRITING_REPORT\", \"target_field_refs\": [{\"field_id\": \"response_report_id\", \"node_id\": \"A01_UNDERWRITING_API\"}, {\"field_id\": \"response_risk_band\", \"node_id\": \"A01_UNDERWRITING_API\"}], \"target_node_id\": \"A01_UNDERWRITING_API\", \"task_id\": \"JOB_REPORT_API\", \"task_name\": \"Underwriting API Publishing\", \"transform_type\": \"api_publish\"}",
+      "supports_claim": "支持核查数据处理任务及其字段传播关系。"
+    },
+    {
+      "evidence_id": "EV-0040",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.RA-P1",
+      "observed_fact": "ID.RA-P1: Contextual factors related to the systems/products/services and the data actions are identified (e.g., individuals’ demographics and privacy interests or perceptions, data sensitivity and/or types, visibility of data processing to individuals and third parties).",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0041",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.RA-P3",
+      "observed_fact": "ID.RA-P3: Potential problematic data actions and associated problems are identified.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0042",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.RA-P2",
+      "observed_fact": "ID.RA-P2: Data analytic inputs and outputs are identified and evaluated for bias.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0043",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.RA-P4",
+      "observed_fact": "ID.RA-P4: Problematic data actions, likelihoods, and impacts are used to determine and prioritize risk.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0044",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.RA-P5",
+      "observed_fact": "ID.RA-P5: Risk responses are identified, prioritized, and implemented.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    }
+  ],
+  "actionable_suggestions": [
+    {
+      "suggestion_id": "SUG-001",
+      "priority": "high",
+      "action": "Reject and Block Change",
+      "rationale": "鉴于用途严重背离且涉及高敏感金融数据，当前申请不符合隐私保护底线。",
+      "owner_role": "Privacy Governance Officer / Data Steward",
+      "completion_criteria": "Formally document the rejection reason citing PPI mismatch and high sensitivity labels.",
+      "blocks_processing": true
+    },
+    {
+      "suggestion_id": "SUG-002",
+      "priority": "high",
+      "action": "Conduct Purpose Limitation Review",
+      "rationale": "Verify whether any previous customer consent explicitly covers marketing personalization based on income-derived bands.",
+      "owner_role": "Legal & Compliance Team",
+      "completion_criteria": "Obtain explicit written confirmation from legal that current usage permits commercial exploitation of financial data.",
+      "blocks_processing": false
+    },
+    {
+      "suggestion_id": "SUG-003",
+      "priority": "medium",
+      "action": "Implement Data Segmentation",
+      "rationale": "If marketing use is eventually approved, physically separate derived marketing profiles from credit-underwriting datasets.",
+      "owner_role": "Data Architecture Team",
+      "completion_criteria": "Create isolated storage containers and enforce distinct access control lists (ACLs) for marketing vs. credit workflows.",
+      "blocks_processing": false
+    }
+  ],
+  "limitations": [
+    "本报告使用 NIST Privacy Framework 1.0 作为自愿性隐私风险管理参考，不构成特定司法辖区的法律合规结论。",
+    "analysis_confidence 为模型自评值，未经统计校准，不能解释为风险发生概率。"
+  ],
+  "analysis_confidence": 0.95
+}

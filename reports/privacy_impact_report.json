@@ -1,0 +1,232 @@
+{
+  "report_id": "RPT-20261118-323DBE9A",
+  "generated_at": "2026-11-18T02:05:33.745513Z",
+  "analysis_context": {
+    "request_id": "REQ-20261118-E895A812",
+    "source_node_id": "T01_CUSTOMER_RAW",
+    "change_type": "purpose_change",
+    "change_description": "申请将客户姓名和电话号码用于营销个性化推荐",
+    "requested_purpose_code": "marketing_personalization",
+    "changed_field_ids": [
+      "full_name",
+      "phone_number"
+    ]
+  },
+  "is_risk_detected": true,
+  "risk_level": "high",
+  "decision": "block_until_review",
+  "summary": "本次用途变更涉及高敏感个人身份信息，且与当前已批准用途不符，构成高风险。建议立即停止使用并进行人工复核。",
+  "impacted_nodes": [
+    {
+      "node_id": "T01_CUSTOMER_RAW",
+      "node_name": "Customer Raw Data",
+      "node_type": "raw_data",
+      "impact_type": "source",
+      "path_depth": 0,
+      "sensitivity_labels": [
+        "high_sensitive_pii",
+        "pseudonymous_pii",
+        "sensitive_financial",
+        "sensitive_pii"
+      ],
+      "original_purpose_codes": [
+        "credit_underwriting",
+        "identity_verification"
+      ],
+      "purpose_match": "outside_original_purpose",
+      "affected_fields": [
+        {
+          "field_id": "full_name",
+          "field_name": "Full Name",
+          "sensitivity_label": "high_sensitive_pii"
+        },
+        {
+          "field_id": "phone_number",
+          "field_name": "Phone Number",
+          "sensitivity_label": "high_sensitive_pii"
+        }
+      ],
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002",
+        "EV-0003"
+      ],
+      "explanation": "该节点为来源节点，包含高敏感PII字段，且新增目的不属于已批准用途，风险高。"
+    }
+  ],
+  "risk_factors": [
+    {
+      "risk_factor_id": "RF-001",
+      "factor_type": "purpose_mismatch",
+      "severity": "high",
+      "description": "用户请求的新用途不属于当前数据节点和所涉及字段的已登记且批准的用途范围。",
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002",
+        "EV-0003"
+      ]
+    },
+    {
+      "risk_factor_id": "RF-002",
+      "factor_type": "high_sensitivity_data",
+      "severity": "high",
+      "description": "本次分析涉及 high_sensitive_pii 或 sensitive_financial 字段，属于高敏感个人身份信息。",
+      "evidence_ids": [
+        "EV-0001",
+        "EV-0002",
+        "EV-0003"
+      ]
+    }
+  ],
+  "compliance_basis": [
+    {
+      "reference_id": "NIST-PF-1.0-PR.AC-P3",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "PROTECT-P",
+      "category_code": "PR.AC-P",
+      "subcategory_code": "PR.AC-P3",
+      "title": "Remote access is managed",
+      "retrieved_text": "Remote access is managed.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.938462,
+      "relevance_explanation": "此条目阐述远程访问管理，可帮助评估在高敏感PII使用场景下的访问控制风险。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-PR.AC-P2",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "PROTECT-P",
+      "category_code": "PR.AC-P",
+      "subcategory_code": "PR.AC-P2",
+      "title": "Physical access to data and devices is managed",
+      "retrieved_text": "Physical access to data and devices is managed.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.901935,
+      "relevance_explanation": "此条目强调物理访问管理，间接支持高敏感数据的安全控制要求。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-PR.AC-P5",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "PROTECT-P",
+      "category_code": "PR.AC-P",
+      "subcategory_code": "PR.AC-P5",
+      "title": "Network integrity is protected (e.g., network segregation, network segmentation)",
+      "retrieved_text": "Network integrity is protected (e.g., network segregation, network segmentation).",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.84625,
+      "relevance_explanation": "此条目说明网络完整性保护，可评估数据传输路径的安全性。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.IM-P6",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.IM-P",
+      "subcategory_code": "ID.IM-P6",
+      "title": "Data elements within the data actions are inventoried",
+      "retrieved_text": "Data elements within the data actions are inventoried.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.82179,
+      "relevance_explanation": "此条目支持对数据元素进行清点，可验证高敏感字段是否已纳入管理范围。"
+    },
+    {
+      "reference_id": "NIST-PF-1.0-ID.IM-P1",
+      "framework_name": "NIST Privacy Framework",
+      "framework_version": "1.0",
+      "function_code": "IDENTIFY-P",
+      "category_code": "ID.IM-P",
+      "subcategory_code": "ID.IM-P1",
+      "title": "Systems/products/services that process data are inventoried",
+      "retrieved_text": "Systems/products/services that process data are inventoried.",
+      "source_url": "https://www.nist.gov/privacy-framework/privacy-framework",
+      "relevance_score": 0.809499,
+      "relevance_explanation": "此条目说明系统级别的数据处理资产清单，有助于评估用途变更的整体影响。"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "EV-0001",
+      "source_type": "graph_node",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW",
+      "observed_fact": "{\"asset_kind\": \"table\", \"name\": \"Customer Raw Data\", \"node_id\": \"T01_CUSTOMER_RAW\", \"node_type\": \"raw_data\", \"original_purposes\": [{\"approval_status\": \"approved\", \"description\": \"客户身份核验\", \"purpose_code\": \"identity_verification\"}, {\"approval_status\": \"approved\", \"description\": \"信用风险评估与授信审批\", \"purpose_code\": \"credit_underwriting\"}], \"sensitivity_labels\": [\"high_sensitive_pii\", \"pseudonymous_pii\", \"sensitive_financial\", \"sensitive_pii\"]}",
+      "supports_claim": "支持核查该数据资产的类型、敏感度与登记用途。"
+    },
+    {
+      "evidence_id": "EV-0002",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW.fields.full_name",
+      "observed_fact": "{\"data_type\": \"VARCHAR(100)\", \"field_id\": \"full_name\", \"name\": \"Full Name\", \"node_id\": \"T01_CUSTOMER_RAW\", \"purpose_codes\": [\"identity_verification\"], \"sensitivity_label\": \"high_sensitive_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0003",
+      "source_type": "graph_field",
+      "source_tool": "get_node_details",
+      "source_pointer": "T01_CUSTOMER_RAW.fields.phone_number",
+      "observed_fact": "{\"data_type\": \"VARCHAR(20)\", \"field_id\": \"phone_number\", \"name\": \"Phone Number\", \"node_id\": \"T01_CUSTOMER_RAW\", \"purpose_codes\": [\"identity_verification\"], \"sensitivity_label\": \"high_sensitive_pii\"}",
+      "supports_claim": "支持核查具体字段的敏感度及允许用途。"
+    },
+    {
+      "evidence_id": "EV-0004",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-PR.AC-P3",
+      "observed_fact": "PR.AC-P3: Remote access is managed.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0005",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-PR.AC-P2",
+      "observed_fact": "PR.AC-P2: Physical access to data and devices is managed.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0006",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-PR.AC-P5",
+      "observed_fact": "PR.AC-P5: Network integrity is protected (e.g., network segregation, network segmentation).",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0007",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.IM-P6",
+      "observed_fact": "ID.IM-P6: Data elements within the data actions are inventoried.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    },
+    {
+      "evidence_id": "EV-0008",
+      "source_type": "policy_record",
+      "source_tool": "match_privacy_policy",
+      "source_pointer": "NIST-PF-1.0-ID.IM-P1",
+      "observed_fact": "ID.IM-P1: Systems/products/services that process data are inventoried.",
+      "supports_claim": "支持将本次分析与 NIST 框架条目建立关联。"
+    }
+  ],
+  "actionable_suggestions": [
+    {
+      "suggestion_id": "SUG-001",
+      "priority": "high",
+      "action": "立即停止在营销个性化推荐中使用全名和电话号码",
+      "rationale": "该用途与已批准用途不符，涉及高敏感PII，存在合规风险。",
+      "owner_role": "数据治理团队",
+      "completion_criteria": "确认已停止使用并记录复核意见",
+      "blocks_processing": true
+    }
+  ],
+  "limitations": [
+    "本报告使用 NIST Privacy Framework 1.0 作为自愿性隐私风险管理参考，不构成特定司法辖区的法律合规结论。",
+    "analysis_confidence 为模型自评值，未经统计校准，不能解释为风险发生概率。",
+    "当前源字段没有通过已登记 Edge 找到下游传播路径，不能据此证明其他未登记的数据流转绝对不存在。",
+    "本分析基于当前检索结果，若有遗漏或更新，风险评估结果可能变更。"
+  ],
+  "analysis_confidence": 0.78
+}

@@ -1,0 +1,383 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.org/schemas/data-lineage-graph.schema.json",
+    "title": "Financial Data Lineage Graph",
+    "description": "Schema for financial platform data lineage and privacy impact analysis.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema_version",
+        "graph_id",
+        "platform",
+        "snapshot_at",
+        "classification_policy_version",
+        "nodes",
+        "edges"
+    ],
+    "properties": {
+        "schema_version": {
+            "const": "1.0.0"
+        },
+        "graph_id": {
+            "type": "string",
+            "minLength": 1
+        },
+        "platform": {
+            "type": "string",
+            "minLength": 1
+        },
+        "snapshot_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "classification_policy_version": {
+            "type": "string"
+        },
+        "nodes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "$ref": "#/$defs/node"
+            }
+        },
+        "edges": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/edge"
+            }
+        }
+    },
+    "$defs": {
+        "purpose": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "purpose_code",
+                "description",
+                "approval_status"
+            ],
+            "properties": {
+                "purpose_code": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,63}$"
+                },
+                "description": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "approval_status": {
+                    "type": "string",
+                    "enum": [
+                        "approved",
+                        "pending",
+                        "prohibited"
+                    ]
+                },
+                "policy_reference": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "field": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "field_id",
+                "name",
+                "data_type",
+                "field_role",
+                "sensitivity_label",
+                "purpose_codes",
+                "description"
+            ],
+            "properties": {
+                "field_id": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{1,63}$"
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "data_type": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "field_role": {
+                    "type": "string",
+                    "enum": [
+                        "column",
+                        "request",
+                        "response"
+                    ]
+                },
+                "sensitivity_label": {
+                    "type": "string",
+                    "enum": [
+                        "high_sensitive_pii",
+                        "sensitive_pii",
+                        "pseudonymous_pii",
+                        "sensitive_financial",
+                        "derived_sensitive",
+                        "non_sensitive"
+                    ]
+                },
+                "purpose_codes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]{1,63}$"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "node": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "node_id",
+                "name",
+                "asset_kind",
+                "node_type",
+                "description",
+                "sensitivity_labels",
+                "original_purposes",
+                "fields"
+            ],
+            "properties": {
+                "node_id": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "asset_kind": {
+                    "type": "string",
+                    "enum": [
+                        "table",
+                        "api"
+                    ]
+                },
+                "node_type": {
+                    "type": "string",
+                    "enum": [
+                        "raw_data",
+                        "profile",
+                        "feature_set",
+                        "score",
+                        "report",
+                        "api"
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "sensitivity_labels": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "high_sensitive_pii",
+                            "sensitive_pii",
+                            "pseudonymous_pii",
+                            "sensitive_financial",
+                            "derived_sensitive",
+                            "non_sensitive"
+                        ]
+                    }
+                },
+                "original_purposes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/purpose"
+                    }
+                },
+                "fields": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/field"
+                    }
+                },
+                "database_name": {
+                    "type": "string"
+                },
+                "schema_name": {
+                    "type": "string"
+                },
+                "table_name": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "http_method": {
+                    "type": "string",
+                    "enum": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE"
+                    ]
+                },
+                "api_version": {
+                    "type": "string"
+                }
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "asset_kind": {
+                                "const": "table"
+                            }
+                        },
+                        "required": [
+                            "asset_kind"
+                        ]
+                    },
+                    "then": {
+                        "required": [
+                            "database_name",
+                            "schema_name",
+                            "table_name"
+                        ],
+                        "properties": {
+                            "node_type": {
+                                "not": {
+                                    "const": "api"
+                                }
+                            }
+                        }
+                    },
+                    "else": {
+                        "properties": {
+                            "node_type": {
+                                "const": "api"
+                            }
+                        },
+                        "required": [
+                            "endpoint",
+                            "http_method",
+                            "api_version"
+                        ]
+                    }
+                }
+            ]
+        },
+        "field_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "node_id",
+                "field_id"
+            ],
+            "properties": {
+                "node_id": {
+                    "type": "string"
+                },
+                "field_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "edge": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "edge_id",
+                "source_node_id",
+                "target_node_id",
+                "task_id",
+                "task_name",
+                "transform_type",
+                "description",
+                "execution_mode",
+                "source_field_refs",
+                "target_field_refs",
+                "processing_purpose_codes"
+            ],
+            "properties": {
+                "edge_id": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "source_node_id": {
+                    "type": "string"
+                },
+                "target_node_id": {
+                    "type": "string"
+                },
+                "task_id": {
+                    "type": "string"
+                },
+                "task_name": {
+                    "type": "string"
+                },
+                "transform_type": {
+                    "type": "string",
+                    "enum": [
+                        "copy",
+                        "normalize",
+                        "aggregate",
+                        "derive",
+                        "join",
+                        "model_inference",
+                        "classify",
+                        "render",
+                        "export",
+                        "api_publish"
+                    ]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "execution_mode": {
+                    "type": "string",
+                    "enum": [
+                        "batch",
+                        "stream",
+                        "realtime",
+                        "manual"
+                    ]
+                },
+                "source_field_refs": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/field_ref"
+                    }
+                },
+                "target_field_refs": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/$defs/field_ref"
+                    }
+                },
+                "processing_purpose_codes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

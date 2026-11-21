@@ -1,8 +1,13 @@
 {
-    "python.analysis.extraPaths": ["${workspaceFolder}"],
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ],
     "editor.formatOnSave": true,
     "files.exclude": {
         "**/__pycache__": true,
         "**/.pytest_cache": true
-    }
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python.terminal.useEnvFile": true
 }

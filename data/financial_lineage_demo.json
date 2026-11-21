@@ -1,0 +1,1395 @@
+{
+    "schema_version": "1.0.0",
+    "graph_id": "fin-credit-demo-v1",
+    "platform": "Northstar Finance Demo Platform",
+    "snapshot_at": "2026-11-18T00:00:00Z",
+    "classification_policy_version": "demo-classification-v1",
+    "nodes": [
+        {
+            "node_id": "T01_CUSTOMER_RAW",
+            "name": "Customer Raw Data",
+            "asset_kind": "table",
+            "node_type": "raw_data",
+            "description": "客户原始身份和财务信息",
+            "database_name": "finance_db",
+            "schema_name": "raw",
+            "table_name": "customer_raw",
+            "sensitivity_labels": [
+                "high_sensitive_pii",
+                "sensitive_pii",
+                "pseudonymous_pii",
+                "sensitive_financial"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "identity_verification",
+                    "description": "客户身份核验",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "identity_verification",
+                        "credit_underwriting"
+                    ],
+                    "description": "内部客户唯一标识"
+                },
+                {
+                    "field_id": "full_name",
+                    "name": "Full Name",
+                    "data_type": "VARCHAR(100)",
+                    "field_role": "column",
+                    "sensitivity_label": "high_sensitive_pii",
+                    "purpose_codes": [
+                        "identity_verification"
+                    ],
+                    "description": "客户真实姓名"
+                },
+                {
+                    "field_id": "phone_number",
+                    "name": "Phone Number",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "high_sensitive_pii",
+                    "purpose_codes": [
+                        "identity_verification"
+                    ],
+                    "description": "客户联系电话"
+                },
+                {
+                    "field_id": "date_of_birth",
+                    "name": "Date of Birth",
+                    "data_type": "DATE",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_pii",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "出生日期，用于计算年龄段"
+                },
+                {
+                    "field_id": "annual_income",
+                    "name": "Annual Income",
+                    "data_type": "DECIMAL(14,2)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户年度收入"
+                }
+            ]
+        },
+        {
+            "node_id": "T02_TRANSACTION_RAW",
+            "name": "Transaction Raw Data",
+            "asset_kind": "table",
+            "node_type": "raw_data",
+            "description": "客户原始交易记录",
+            "database_name": "finance_db",
+            "schema_name": "raw",
+            "table_name": "transaction_raw",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "fraud_detection",
+                    "description": "异常交易与欺诈检测",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "transaction_id",
+                    "name": "Transaction ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "fraud_detection"
+                    ],
+                    "description": "交易记录唯一标识"
+                },
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "fraud_detection"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "amount",
+                    "name": "Transaction Amount",
+                    "data_type": "DECIMAL(14,2)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "fraud_detection"
+                    ],
+                    "description": "交易金额"
+                },
+                {
+                    "field_id": "transaction_time",
+                    "name": "Transaction Time",
+                    "data_type": "TIMESTAMP",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "fraud_detection"
+                    ],
+                    "description": "交易发生时间"
+                }
+            ]
+        },
+        {
+            "node_id": "T03_DEVICE_EVENT_RAW",
+            "name": "Device Event Raw Data",
+            "asset_kind": "table",
+            "node_type": "raw_data",
+            "description": "用户设备访问和安全事件",
+            "database_name": "finance_db",
+            "schema_name": "raw",
+            "table_name": "device_event_raw",
+            "sensitivity_labels": [
+                "high_sensitive_pii",
+                "pseudonymous_pii",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "fraud_detection",
+                    "description": "设备异常及欺诈检测",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "event_id",
+                    "name": "Event ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "fraud_detection"
+                    ],
+                    "description": "设备事件标识"
+                },
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "fraud_detection",
+                        "credit_underwriting"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "ip_address",
+                    "name": "IP Address",
+                    "data_type": "VARCHAR(45)",
+                    "field_role": "column",
+                    "sensitivity_label": "high_sensitive_pii",
+                    "purpose_codes": [
+                        "fraud_detection"
+                    ],
+                    "description": "用户访问 IP 地址"
+                },
+                {
+                    "field_id": "event_timestamp",
+                    "name": "Event Timestamp",
+                    "data_type": "TIMESTAMP",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "fraud_detection"
+                    ],
+                    "description": "设备事件发生时间"
+                }
+            ]
+        },
+        {
+            "node_id": "T04_CREDIT_BUREAU_RAW",
+            "name": "Credit Bureau Raw Data",
+            "asset_kind": "table",
+            "node_type": "raw_data",
+            "description": "外部信用机构返回的客户信用记录",
+            "database_name": "finance_db",
+            "schema_name": "raw",
+            "table_name": "credit_bureau_raw",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "debt_to_income_ratio",
+                    "name": "Debt To Income Ratio",
+                    "data_type": "DECIMAL(6,4)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "债务收入比"
+                },
+                {
+                    "field_id": "delinquency_90d_count",
+                    "name": "90 Day Delinquency Count",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "近 90 天逾期次数"
+                },
+                {
+                    "field_id": "credit_utilization_ratio",
+                    "name": "Credit Utilization Ratio",
+                    "data_type": "DECIMAL(6,4)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "信用额度使用率"
+                }
+            ]
+        },
+        {
+            "node_id": "T05_CUSTOMER_PROFILE",
+            "name": "Customer Profile",
+            "asset_kind": "table",
+            "node_type": "profile",
+            "description": "客户基础画像",
+            "database_name": "finance_db",
+            "schema_name": "analytics",
+            "table_name": "customer_profile",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_pii",
+                "sensitive_financial"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "age_band",
+                    "name": "Age Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_pii",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户年龄区间"
+                },
+                {
+                    "field_id": "income_band",
+                    "name": "Income Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户收入区间"
+                }
+            ]
+        },
+        {
+            "node_id": "T06_BEHAVIOR_FEATURES",
+            "name": "Behavior Features",
+            "asset_kind": "table",
+            "node_type": "feature_set",
+            "description": "客户消费行为及设备风险特征",
+            "database_name": "finance_db",
+            "schema_name": "analytics",
+            "table_name": "behavior_features",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "derived_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "fraud_detection",
+                    "description": "异常行为及欺诈检测",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "fraud_detection"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "monthly_txn_count",
+                    "name": "Monthly Transaction Count",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "derived_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户每月交易次数"
+                },
+                {
+                    "field_id": "avg_monthly_spend",
+                    "name": "Average Monthly Spend",
+                    "data_type": "DECIMAL(14,2)",
+                    "field_role": "column",
+                    "sensitivity_label": "derived_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "月均消费金额"
+                },
+                {
+                    "field_id": "device_risk_count",
+                    "name": "Device Risk Count",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "derived_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "fraud_detection"
+                    ],
+                    "description": "关联的异常设备事件数量"
+                }
+            ]
+        },
+        {
+            "node_id": "T07_CREDIT_FEATURE_SET",
+            "name": "Credit Feature Set",
+            "asset_kind": "table",
+            "node_type": "feature_set",
+            "description": "信用评分模型输入特征",
+            "database_name": "finance_db",
+            "schema_name": "ml",
+            "table_name": "credit_feature_set",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "derived_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "income_band",
+                    "name": "Income Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "收入区间特征"
+                },
+                {
+                    "field_id": "debt_to_income_ratio",
+                    "name": "Debt To Income Ratio",
+                    "data_type": "DECIMAL(6,4)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "债务收入比特征"
+                },
+                {
+                    "field_id": "delinquency_90d_count",
+                    "name": "90 Day Delinquency Count",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "近 90 天逾期次数特征"
+                },
+                {
+                    "field_id": "credit_utilization_ratio",
+                    "name": "Credit Utilization Ratio",
+                    "data_type": "DECIMAL(6,4)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "信用额度使用率特征"
+                },
+                {
+                    "field_id": "monthly_txn_count",
+                    "name": "Monthly Transaction Count",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "derived_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "交易频率特征"
+                },
+                {
+                    "field_id": "device_risk_count",
+                    "name": "Device Risk Count",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "derived_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "设备风险统计特征"
+                }
+            ]
+        },
+        {
+            "node_id": "T08_CREDIT_SCORE",
+            "name": "Credit Score",
+            "asset_kind": "table",
+            "node_type": "score",
+            "description": "机器学习信用评分结果",
+            "database_name": "finance_db",
+            "schema_name": "ml",
+            "table_name": "credit_score",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "regulatory_audit",
+                    "description": "内部及监管审计",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "score_value",
+                    "name": "Credit Score Value",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "信用评分数值"
+                },
+                {
+                    "field_id": "model_version",
+                    "name": "Model Version",
+                    "data_type": "VARCHAR(32)",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "评分模型版本"
+                }
+            ]
+        },
+        {
+            "node_id": "T09_RISK_ASSESSMENT",
+            "name": "Risk Assessment",
+            "asset_kind": "table",
+            "node_type": "score",
+            "description": "客户信用风险分类和决策原因",
+            "database_name": "finance_db",
+            "schema_name": "analytics",
+            "table_name": "risk_assessment",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "regulatory_audit",
+                    "description": "内部及监管审计",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "assessment_id",
+                    "name": "Assessment ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "风险评估记录 ID"
+                },
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "risk_band",
+                    "name": "Risk Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "信用风险等级"
+                },
+                {
+                    "field_id": "reason_codes",
+                    "name": "Decision Reason Codes",
+                    "data_type": "JSON",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "风险分类原因"
+                }
+            ]
+        },
+        {
+            "node_id": "T10_UNDERWRITING_REPORT",
+            "name": "Underwriting Report",
+            "asset_kind": "table",
+            "node_type": "report",
+            "description": "客户授信分析报告",
+            "database_name": "finance_db",
+            "schema_name": "reporting",
+            "table_name": "underwriting_report",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                },
+                {
+                    "purpose_code": "regulatory_audit",
+                    "description": "内部及监管审计",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "report_id",
+                    "name": "Report ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "报告唯一标识"
+                },
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "risk_band",
+                    "name": "Risk Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "最终风险等级"
+                },
+                {
+                    "field_id": "generated_at",
+                    "name": "Generated At",
+                    "data_type": "TIMESTAMP",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting",
+                        "regulatory_audit"
+                    ],
+                    "description": "报告生成时间"
+                }
+            ]
+        },
+        {
+            "node_id": "T11_AUDIT_EXPORT",
+            "name": "Audit Export",
+            "asset_kind": "table",
+            "node_type": "report",
+            "description": "供内部审计使用的授信信息导出表",
+            "database_name": "finance_db",
+            "schema_name": "audit",
+            "table_name": "audit_export",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "regulatory_audit",
+                    "description": "内部及监管审计",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "export_id",
+                    "name": "Export ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "regulatory_audit"
+                    ],
+                    "description": "审计导出批次标识"
+                },
+                {
+                    "field_id": "customer_id",
+                    "name": "Customer ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "column",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "regulatory_audit"
+                    ],
+                    "description": "客户关联标识"
+                },
+                {
+                    "field_id": "score_value",
+                    "name": "Credit Score Value",
+                    "data_type": "INTEGER",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "regulatory_audit"
+                    ],
+                    "description": "审计用信用评分"
+                },
+                {
+                    "field_id": "risk_band",
+                    "name": "Risk Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "column",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "regulatory_audit"
+                    ],
+                    "description": "审计用风险等级"
+                }
+            ]
+        },
+        {
+            "node_id": "A01_UNDERWRITING_API",
+            "name": "Underwriting Report API",
+            "asset_kind": "api",
+            "node_type": "api",
+            "description": "对外提供客户授信报告查询接口",
+            "endpoint": "/v1/underwriting/reports",
+            "http_method": "GET",
+            "api_version": "v1",
+            "sensitivity_labels": [
+                "pseudonymous_pii",
+                "sensitive_financial",
+                "non_sensitive"
+            ],
+            "original_purposes": [
+                {
+                    "purpose_code": "credit_underwriting",
+                    "description": "信用风险评估与授信审批",
+                    "approval_status": "approved"
+                }
+            ],
+            "fields": [
+                {
+                    "field_id": "request_customer_id",
+                    "name": "Customer ID Parameter",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "request",
+                    "sensitivity_label": "pseudonymous_pii",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "请求中的客户标识"
+                },
+                {
+                    "field_id": "request_purpose_code",
+                    "name": "Requested Purpose",
+                    "data_type": "VARCHAR(64)",
+                    "field_role": "request",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "请求业务用途"
+                },
+                {
+                    "field_id": "response_report_id",
+                    "name": "Report ID",
+                    "data_type": "VARCHAR(36)",
+                    "field_role": "response",
+                    "sensitivity_label": "non_sensitive",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "返回的报告标识"
+                },
+                {
+                    "field_id": "response_risk_band",
+                    "name": "Risk Band",
+                    "data_type": "VARCHAR(20)",
+                    "field_role": "response",
+                    "sensitivity_label": "sensitive_financial",
+                    "purpose_codes": [
+                        "credit_underwriting"
+                    ],
+                    "description": "返回的信用风险等级"
+                }
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "edge_id": "E01_PROFILE_BUILD",
+            "source_node_id": "T01_CUSTOMER_RAW",
+            "target_node_id": "T05_CUSTOMER_PROFILE",
+            "task_id": "JOB_PROFILE_BUILD",
+            "task_name": "Customer Profile Building",
+            "transform_type": "derive",
+            "description": "根据出生日期计算年龄段，根据年收入生成收入区间；姓名及手机号不下传。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T01_CUSTOMER_RAW",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T01_CUSTOMER_RAW",
+                    "field_id": "date_of_birth"
+                },
+                {
+                    "node_id": "T01_CUSTOMER_RAW",
+                    "field_id": "annual_income"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T05_CUSTOMER_PROFILE",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T05_CUSTOMER_PROFILE",
+                    "field_id": "age_band"
+                },
+                {
+                    "node_id": "T05_CUSTOMER_PROFILE",
+                    "field_id": "income_band"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E02_BEHAVIOR_AGGREGATION",
+            "source_node_id": "T02_TRANSACTION_RAW",
+            "target_node_id": "T06_BEHAVIOR_FEATURES",
+            "task_id": "JOB_BEHAVIOR_AGG",
+            "task_name": "Transaction Behavior Aggregation",
+            "transform_type": "aggregate",
+            "description": "按客户统计月交易次数和月均消费金额。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T02_TRANSACTION_RAW",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T02_TRANSACTION_RAW",
+                    "field_id": "amount"
+                },
+                {
+                    "node_id": "T02_TRANSACTION_RAW",
+                    "field_id": "transaction_time"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "monthly_txn_count"
+                },
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "avg_monthly_spend"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E03_DEVICE_FEATURE_EXTRACTION",
+            "source_node_id": "T03_DEVICE_EVENT_RAW",
+            "target_node_id": "T06_BEHAVIOR_FEATURES",
+            "task_id": "JOB_DEVICE_RISK",
+            "task_name": "Device Risk Feature Extraction",
+            "transform_type": "derive",
+            "description": "根据客户关联的异常设备事件统计风险数量，原始 IP 不下传。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T03_DEVICE_EVENT_RAW",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T03_DEVICE_EVENT_RAW",
+                    "field_id": "ip_address"
+                },
+                {
+                    "node_id": "T03_DEVICE_EVENT_RAW",
+                    "field_id": "event_timestamp"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "device_risk_count"
+                }
+            ],
+            "processing_purpose_codes": [
+                "fraud_detection",
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E04_BUREAU_FEATURE_MAPPING",
+            "source_node_id": "T04_CREDIT_BUREAU_RAW",
+            "target_node_id": "T07_CREDIT_FEATURE_SET",
+            "task_id": "JOB_CREDIT_FEATURE",
+            "task_name": "Credit Bureau Feature Mapping",
+            "transform_type": "normalize",
+            "description": "将信用机构的债务和逾期数据标准化为模型输入特征。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T04_CREDIT_BUREAU_RAW",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T04_CREDIT_BUREAU_RAW",
+                    "field_id": "debt_to_income_ratio"
+                },
+                {
+                    "node_id": "T04_CREDIT_BUREAU_RAW",
+                    "field_id": "delinquency_90d_count"
+                },
+                {
+                    "node_id": "T04_CREDIT_BUREAU_RAW",
+                    "field_id": "credit_utilization_ratio"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "debt_to_income_ratio"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "delinquency_90d_count"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "credit_utilization_ratio"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E05_PROFILE_FEATURE_MAPPING",
+            "source_node_id": "T05_CUSTOMER_PROFILE",
+            "target_node_id": "T07_CREDIT_FEATURE_SET",
+            "task_id": "JOB_CREDIT_FEATURE",
+            "task_name": "Profile Feature Mapping",
+            "transform_type": "normalize",
+            "description": "将客户画像中的收入区间映射到信用特征数据。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T05_CUSTOMER_PROFILE",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T05_CUSTOMER_PROFILE",
+                    "field_id": "income_band"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "income_band"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E06_BEHAVIOR_FEATURE_MAPPING",
+            "source_node_id": "T06_BEHAVIOR_FEATURES",
+            "target_node_id": "T07_CREDIT_FEATURE_SET",
+            "task_id": "JOB_CREDIT_FEATURE",
+            "task_name": "Behavior Feature Mapping",
+            "transform_type": "join",
+            "description": "将交易频率和设备风险统计合并到信用特征集合。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "monthly_txn_count"
+                },
+                {
+                    "node_id": "T06_BEHAVIOR_FEATURES",
+                    "field_id": "device_risk_count"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "monthly_txn_count"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "device_risk_count"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E07_CREDIT_MODEL_INFERENCE",
+            "source_node_id": "T07_CREDIT_FEATURE_SET",
+            "target_node_id": "T08_CREDIT_SCORE",
+            "task_id": "JOB_CREDIT_MODEL",
+            "task_name": "Credit Model Inference",
+            "transform_type": "model_inference",
+            "description": "使用模型特征执行信用评分，不向输出表写入姓名或电话号码。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "income_band"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "debt_to_income_ratio"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "delinquency_90d_count"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "credit_utilization_ratio"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "monthly_txn_count"
+                },
+                {
+                    "node_id": "T07_CREDIT_FEATURE_SET",
+                    "field_id": "device_risk_count"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "score_value"
+                },
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "model_version"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E08_RISK_CLASSIFICATION",
+            "source_node_id": "T08_CREDIT_SCORE",
+            "target_node_id": "T09_RISK_ASSESSMENT",
+            "task_id": "JOB_RISK_CLASSIFICATION",
+            "task_name": "Risk Classification",
+            "transform_type": "classify",
+            "description": "根据信用评分和预设规则生成风险等级及原因代码。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "score_value"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "assessment_id"
+                },
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "risk_band"
+                },
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "reason_codes"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E09_REPORT_GENERATION",
+            "source_node_id": "T09_RISK_ASSESSMENT",
+            "target_node_id": "T10_UNDERWRITING_REPORT",
+            "task_id": "JOB_REPORT_GENERATION",
+            "task_name": "Underwriting Report Generation",
+            "transform_type": "render",
+            "description": "汇总风险评估结果生成授信报告。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "assessment_id"
+                },
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T09_RISK_ASSESSMENT",
+                    "field_id": "risk_band"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "report_id"
+                },
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "risk_band"
+                },
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "generated_at"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        },
+        {
+            "edge_id": "E10_SCORE_AUDIT_EXPORT",
+            "source_node_id": "T08_CREDIT_SCORE",
+            "target_node_id": "T11_AUDIT_EXPORT",
+            "task_id": "JOB_AUDIT_EXPORT",
+            "task_name": "Credit Score Audit Export",
+            "transform_type": "export",
+            "description": "将信用评分及客户标识写入内部审计导出表。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T08_CREDIT_SCORE",
+                    "field_id": "score_value"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T11_AUDIT_EXPORT",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T11_AUDIT_EXPORT",
+                    "field_id": "score_value"
+                }
+            ],
+            "processing_purpose_codes": [
+                "regulatory_audit"
+            ]
+        },
+        {
+            "edge_id": "E11_REPORT_AUDIT_EXPORT",
+            "source_node_id": "T10_UNDERWRITING_REPORT",
+            "target_node_id": "T11_AUDIT_EXPORT",
+            "task_id": "JOB_AUDIT_EXPORT",
+            "task_name": "Underwriting Report Audit Export",
+            "transform_type": "export",
+            "description": "将报告标识和风险等级写入审计导出表。",
+            "execution_mode": "batch",
+            "source_field_refs": [
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "report_id"
+                },
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "risk_band"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "T11_AUDIT_EXPORT",
+                    "field_id": "export_id"
+                },
+                {
+                    "node_id": "T11_AUDIT_EXPORT",
+                    "field_id": "customer_id"
+                },
+                {
+                    "node_id": "T11_AUDIT_EXPORT",
+                    "field_id": "risk_band"
+                }
+            ],
+            "processing_purpose_codes": [
+                "regulatory_audit"
+            ]
+        },
+        {
+            "edge_id": "E12_REPORT_API_PUBLISH",
+            "source_node_id": "T10_UNDERWRITING_REPORT",
+            "target_node_id": "A01_UNDERWRITING_API",
+            "task_id": "JOB_REPORT_API",
+            "task_name": "Underwriting API Publishing",
+            "transform_type": "api_publish",
+            "description": "通过 API 向授权业务系统提供报告标识和风险等级。",
+            "execution_mode": "realtime",
+            "source_field_refs": [
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "report_id"
+                },
+                {
+                    "node_id": "T10_UNDERWRITING_REPORT",
+                    "field_id": "risk_band"
+                }
+            ],
+            "target_field_refs": [
+                {
+                    "node_id": "A01_UNDERWRITING_API",
+                    "field_id": "response_report_id"
+                },
+                {
+                    "node_id": "A01_UNDERWRITING_API",
+                    "field_id": "response_risk_band"
+                }
+            ],
+            "processing_purpose_codes": [
+                "credit_underwriting"
+            ]
+        }
+    ]
+}
